@@ -68,6 +68,6 @@ TBD
 
 Libraries and their versions required for replication of this analysis are listed in the `requirements.txt` file.
 
-Python version: 3.8.11
+Python version: 3.8.12
 
 Run `conda create --name <env> --file requirements.txt` to create a conda environment, and then `conda activate <env>` to activate it.
