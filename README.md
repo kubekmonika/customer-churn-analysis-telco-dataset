@@ -1,4 +1,4 @@
-# Predict customer churn of customers
+# Predict churn of customers
 
 *This is a capstone project made for the Udacity's Data Scientist Nanodegree program.*
 
