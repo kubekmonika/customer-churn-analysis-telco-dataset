@@ -39,6 +39,8 @@ In our problem we want to detected as many customers who may churn as possible, 
 
 ### Project's file structure
 
+TBD: poprawić strukturę plików
+
 ```
 - app
 | - template
@@ -91,13 +93,13 @@ As a result of the EDA, the following set of features was chosen to build the mo
 
 ## Model
 
-In training all the models the 10-fold cross-validation is used. We do not need to perform any imputation method, as no missing values occure in this datasest.
+In training all the models, the 5-fold cross-validation is used. We do not need to perform any imputation method, as no missing values occure in this datasest.
 
 ### Initial results
 
 With basic setup the results looked as follows:
 
-<img src="images/model_iter_01.png" alt="Models comparison - basic setup" width="600"/>
+<img src="modelling/images/model_iter_01.png" alt="Models comparison - basic setup" width="600"/>
 
 ### Improving the setup
 
@@ -108,31 +110,93 @@ After testing some tweaks, I ended with the following configuration:
 
 And here are the results:
 
-<img src="images/model_iter_02.png" alt="Models comparison - final setup" width="600"/>
+<img src="modelling/images/model_iter_02.png" alt="Models comparison - final setup" width="600"/>
 
 We see that the later setup improved the F1 score for the top three models. 
 
 ### Tuning models
 
-I chose four models for the hyperparameters tuning:
-* Logistic regression
-* Ridge classifier
-* Linear SVM
-* Decision tree classifier
-
 The detailed analysis of the tuning results is available in the `model.ipynb` notebook.
 
-Of the four models, the first three gave very similar results, and the last one was worse. So I decided to choose (arbitrarily) the logistic regression model.
+Here are the results obtained when validating the models.
+
+**Logistic regression**
+
+```md
++---------------+------------+----------+-------------+------+
+|               |   Accuracy |   Recall |   Precision |   F1 |
++===============+============+==========+=============+======+
+| Model Summary |      0.743 |    0.731 |       0.509 |0.600 |
++---------------+------------+----------+-------------+------+
+```
+
+**Ridge classifier**
+
+```md
++---------------+------------+----------+-------------+-------+
+|               |   Accuracy |   Recall |   Precision |    F1 |
++===============+============+==========+=============+=======+
+| Model Summary |      0.746 |    0.742 |       0.513 | 0.607 |
++---------------+------------+----------+-------------+-------+
+```
+
+**Linear SVM**
+
+```md
++---------------+------------+----------+-------------+-------+
+|               |   Accuracy |   Recall |   Precision |    F1 |
++===============+============+==========+=============+=======+
+| Model Summary |      0.709 |    0.753 |       0.468 | 0.577 |
++---------------+------------+----------+-------------+-------+
+```
+
+**KNN classifier**
+
+```md
++---------------+------------+----------+-------------+-------+
+|               |   Accuracy |   Recall |   Precision |    F1 |
++===============+============+==========+=============+=======+
+| Model Summary |      0.733 |    0.694 |       0.496 | 0.578 |
++---------------+------------+----------+-------------+-------+
+```
+
+**Decision tree**
+
+```md
++---------------+------------+----------+-------------+-------+
+|               |   Accuracy |   Recall |   Precision |    F1 |
++===============+============+==========+=============+=======+
+| Model Summary |      0.722 |    0.613 |       0.479 | 0.538 |
++---------------+------------+----------+-------------+-------+
+```
+
+The logistic regression and the Ridge classifier give similar best results. I choose the logistic regression as the final model for the problem.
+
 
 ### The final model
 
-Here are the statistics describing the tuned linear regression model:
+Here are the statistics describing the linear regression model which was trained using the entire train+test dataset and validated on unseed data:
 
-<img src="images/tuned_lr.png" alt="Tuned final model - statistics" width="600"/>
+```md
++---------------+------------+----------+-------------+-------+
+|               |   Accuracy |   Recall |   Precision |    F1 |
++===============+============+==========+=============+=======+
+| Model Summary |      0.741 |     0.71 |       0.508 | 0.592 |
++---------------+------------+----------+-------------+-------+
+```
 
-and the visualisation of the class prediction error, where `1` means *churned* and `0` means *not churned*.
+The visualisation of the class prediction error, where `1` means *churned* and `0` means *not churned*.
 
-<img src="images/class_prediction_error.png" alt="Class prediction error" width="580"/>
+<img src="modelling/images/Prediction Error.png" alt="Class prediction error" width="580"/>
+
+The visualisation of the cofusion matrix.
+
+<img src="modelling/images/Confusion Matrix.png" alt="Class prediction error" width="500"/>
+
+The top 10 features according to their importance.
+
+<img src="modelling/images/Feature Importance.png" alt="Class prediction error" width="700"/>
+
 
 ## Web app
 
@@ -142,7 +206,7 @@ TBD
 
 ## How to run it
 
-### Installation
+### Creating the conda environment
 
 Libraries and their versions required for replication of this analysis are listed in the `requirements.txt` file.
 
@@ -153,3 +217,7 @@ Run `conda create --name <env> --file requirements.txt` to create a conda enviro
 ### Notebooks
 
 Navigate to the projekt's main directory and run `jupyter lab`, then you can open the notebooks from within this lab environment.
+
+### Pipelines
+
+TBD
