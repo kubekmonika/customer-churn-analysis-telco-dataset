@@ -4,7 +4,7 @@ import numpy as np
 import seaborn as sns
 
 import warnings
-
+import sqlite3
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 sns.set()
@@ -167,3 +167,87 @@ def heatmap_churned_customers_share(data, columns):
     styled_summary = summary.style.background_gradient(cmap=cm, vmin=0, vmax=1)
 
     return styled_summary
+
+
+def load_data(data_filepath):
+    """
+    Load data and return it as a data frame.
+
+    Parameters
+    ----------
+    data_filepath : string
+        Path to the database with data.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataset.
+    """
+    return pd.read_csv(data_filepath, index_col='customerID')
+
+
+def clean_data(data):
+    """
+    Clean the data.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataset.
+
+    Returns
+    -------
+    pd.DataFrame
+        Cleaned dataset.
+    """
+    data['SeniorCitizen'] = data['SeniorCitizen'].map({1: 'Yes', 0: 'No'})
+    data['TotalCharges'] = data['TotalCharges'].str.replace(' ', '0').astype(float)
+    data.columns = [col[0].upper() + col[1:] for col in data.columns]
+
+    return data
+
+
+def transform_data(data):
+    """
+    Transform data and create the features for the model. Return a data frame
+    with only the features that will be used for modelling.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataset.
+
+    Returns
+    -------
+    pd.DataFrame
+        Transformed dataset.
+    """
+    cols_for_model = [
+        'Gender', 'SeniorCitizen', 'Partner', 'Dependents',
+        'PhoneService', 'InternetService', 'OnlineSecurity',
+        'OnlineBackup', 'DeviceProtection', 'TechSupport', 'StreamingTV',
+        'StreamingMovies', 'Contract', 'PaperlessBilling', 'PaymentMethod',
+        'TenureBuckets', 'MonthlyChargesBuckets', 'MultipleLinesBuckets',
+        'NumInternetlServices', 'Churn'
+    ]
+    data['TenureBuckets'] = data['Tenure'].apply(feature_tenure_bucket)
+    data['MonthlyChargesBuckets'] = data['MonthlyCharges'].apply(feature_monthlycharges_bucket)
+    data['MultipleLinesBuckets'] = data['MultipleLines'].apply(feature_multiplelines_bucket)
+    data['NumInternetlServices'] = feature_numinternetservices(data)
+
+    return data[cols_for_model]
+
+
+def save_data(data, database_filepath):
+    """
+    Save the data to the database.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataset.
+    database_filepath : string
+        Path where to save the database.
+    """
+    conn = sqlite3.connect(database_filepath)
+    data.to_sql('data', conn, index=True, if_exists='replace')
