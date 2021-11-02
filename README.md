@@ -35,7 +35,7 @@ To evaluate the model we should choose metrics that are relevant to the problem 
 
 *Accuracy* is not a good metric to use in our case, because the target feature (`churn`) is not balanced throughout the dataset - 26.5% of customers are labeled as churned and 73.5% are not. This means that if we label all the customers as not churning, then we will have 73% accuracy - even though this number looks impressive, the model is useless.
 
-In our problem we want to detected as many customers who may churn as possible, so that we can act and prevent it. But on the other hand, we do not want to bother too many customers who do not plan to leave our service. Hence, we need to find a model with good balance between *precision* and *recall*, and also optimize the model for these metrics.
+In our problem we want to detected as many customers who may churn as possible, so that we can act and prevent it. But on the other hand, we do not want to bother too many customers who do not plan to leave our service. Hence, we need to find a model with good balance between *precision* and *recall*, and also optimise the model for these metrics. The *F-score* is a way of combining the precision and recall of the model, and it is defined as the harmonic mean of the model’s precision and recall. Later, the *F-score* will be used to compare models and choosing the best one.
 
 ### Project's file structure
 
@@ -58,7 +58,7 @@ TBD: poprawić strukturę plików
 
 - model
 |- train_classifier.py  # script that creates the ML model
-|- classifier.pkl  # saved model 
+|- classifier.pkl  # saved model
 
 - README.md
 - requirements.txt
@@ -112,7 +112,7 @@ And here are the results:
 
 <img src="modelling/images/model_iter_02.png" alt="Models comparison - final setup" width="600"/>
 
-We see that the later setup improved the F1 score for the top three models. 
+We see that the later setup improved the F1 score for the top three models.
 
 ### Tuning models
 
@@ -181,7 +181,7 @@ Here are the statistics describing the linear regression model which was trained
 +---------------+------------+----------+-------------+-------+
 |               |   Accuracy |   Recall |   Precision |    F1 |
 +===============+============+==========+=============+=======+
-| Model Summary |      0.741 |     0.71 |       0.508 | 0.592 |
+| Model Summary |      0.760 |    0.812 |       0.517 | 0.632 |
 +---------------+------------+----------+-------------+-------+
 ```
 

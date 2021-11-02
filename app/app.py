@@ -12,7 +12,7 @@ from flask import render_template, request, jsonify, request, url_for
 import plotly.graph_objs as gobj
 
 from collections import defaultdict
-from pycaret.classification import load_model
+from pycaret.classification import *
 
 
 app = Flask(__name__)
@@ -31,12 +31,9 @@ def dataset_details():
 
 @app.route('/model_details')
 def model_details():
-    return render_template('model_details.html')
+    summary = modelling.evaluate_model(model, df, outcome='return')
 
-
-@app.route('/base')
-def model():
-    return render_template('base.html')
+    return render_template('model_details.html', summary=summary)
 
 
 @app.route('/prediction', methods=['GET', 'POST'])
@@ -59,14 +56,15 @@ def main():
     database_filepath, model_filepath = sys.argv[1:]
 
     global df
-    global model_
+    global model
 
     # load data
-    data = modelling.load_data(database_filepath)
-    features = data.columns.tolist()
+    df = modelling.load_data(database_filepath)
+    print(df.columns)
 
     # load model
-    model_ = load_model(model_filepath)
+    model = load_model(model_filepath.replace('.pkl', ''))
+    print(model)
 
     # run the app
     app.run(host='0.0.0.0', port=3001, debug=True)
