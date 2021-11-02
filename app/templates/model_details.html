@@ -8,19 +8,19 @@
       <li class="list-group-item d-flex justify-content-between align-items-start">
         <div class="ms-2 me-auto">
           <h5 class="text">Accuracy</h5>
-          How often the model prediction was correct: 74%
+          How often the model prediction was correct: {{ (summary['Accuracy'] * 100)|int }}%
         </div>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-start">
         <div class="ms-2 me-auto">
           <h5 class="text">Precision</h5>
-          What proportion of positive identifications was actually correct?: 50%
+          What proportion of positive identifications was actually correct: {{ (summary['Precision'] * 100)|int }}%
         </div>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-start">
         <div class="ms-2 me-auto">
           <h5 class="text">Recall</h5>
-          What proportion of actual positives was identified correctly?: 71%
+          What proportion of actual positives was identified correctly: {{ (summary['Recall'] * 100)|int }}%
         </div>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-start">
@@ -29,15 +29,6 @@
           <p class="text">Churn: 0-No, 1-Yes</p>
           <div class="text-center">
             <img class="img-fluid" src="../../modelling/images/Prediction Error.png" alt="Class prediction error"/>
-          </div>
-        </div>
-      </li>
-      <li class="list-group-item d-flex justify-content-between align-items-start">
-        <div class="ms-2 me-auto">
-          <h5 class="text">Confusion matrix</h5>
-          <p class="text">Summary of the number of correct and incorrect predictions</p>
-          <div class="text-center">
-            <img class="img-fluid" src="../../modelling/images/Confusion Matrix.png" alt="Confusion matrix"/>
           </div>
         </div>
       </li>

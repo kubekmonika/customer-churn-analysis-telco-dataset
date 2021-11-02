@@ -2,12 +2,104 @@
 {% block title %}Make prediction{% endblock %}
 
 {% block content %}
-      <h3 class="text-center">Select customer characteristics</h3>
-      <br>
-      <select class="form-select" aria-label="Default select example">
-        <option selected>Open this select menu</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
-      </select>
+<h3 class="text-center">Select customer characteristics</h3>
+<hr>
+<form action="{{url_for('prediction')}}" method="post">
+    <div class="container-md">
+      <div class="row" style="margin-bottom: 20px">
+        {% for feature, values in basic_f.items() %}
+          <div class="col-sm-3" style="margin-bottom: 15px">
+            <label class="form-label">{{ feature }}</label>
+            <br>
+            <select class="form-select" id="{{ feature }}" name="{{ feature }}">
+              {% for value in values %}
+                {% if loop.first %}
+                  <option selected>{{ value }}</option>
+                {% else %}
+                <option value="{{ value }}">{{ value }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="container-md">
+      <div class="row">
+        <div class="col-sm-4">
+          {% for feature, values in numerical_f.items() %}
+              <label class="form-label">{{ feature }}</label>
+              <br>
+              <div class="input-group mb-3">
+                <span class="input-group-text">
+                  Provide a number between {{ values['min']}} and {{ values['max']}}
+                </span>
+                <input type="text" class="form-control" id="{{ feature }}" name="{{ feature }}">
+              </div>
+              <br>
+          {% endfor %}
+        </div>
+          <div class="col-sm-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="PhoneServiceEnabled" name="PhoneServiceEnabled">
+              <label class="form-check-label" for="flexCheckDefault">
+                PhoneService
+              </label>
+            </div>
+            <p class="text">Choose if phone service enabled:</p>
+            {% for feature, values in phone_f.items() %}
+                {% if feature == "PhoneService" %}
+                {% else %}
+                  <div class="row" style="margin-left: 25px">
+                    <label class="form-label">{{ feature }}</label>
+                    <select class="form-select" id="{{ feature }}" name="{{ feature }}">
+                      {% for value in values %}
+                        {% if loop.first %}
+                          <option selected>{{ value }}</option>
+                        {% else %}
+                          <option value="{{ value }}">{{ value }}</option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                  </div>
+                {% endif %}
+            {% endfor %}
+          </div>
+          <div class="col-sm-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="InternetServiceEnabled" name="InternetServiceEnabled">
+              <label class="form-check-label" for="flexCheckDefault">
+                InternetService
+              </label>
+            </div>
+            <p class="text">Choose if internet service enabled:</p>
+            {% for feature, values in internet_f.items() %}
+                <div class="row" style="margin-left: 25px">
+                  <label class="form-label">{{ feature }}</label>
+                  <select class="form-select" id="{{ feature }}" name="{{ feature }}">
+                    {% for value in values %}
+                      {% if loop.first %}
+                        <option selected>{{ value }}</option>
+                      {% else %}
+                        <option value="{{ value }}">{{ value }}</option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+                </div>
+            {% endfor %}
+          </div>
+      </div>
+    </div>
+      <button type="submit" class="btn btn-primary">Submit data</button>
+</form>
+{% endblock %}
+
+{% block other%}
+<div class="container-md">
+  {% if prediction is defined %}
+      <p class="text">value of variable: {{ prediction }}</p>
+  {% else %}
+      variable is not defined
+  {% endif %}
+</div>
 {% endblock %}
