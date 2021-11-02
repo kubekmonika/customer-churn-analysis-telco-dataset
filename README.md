@@ -197,14 +197,19 @@ The top 10 features according to their importance.
 
 <img src="modelling/images/Feature Importance.png" alt="Class prediction error" width="700"/>
 
+We can conclude that churn is mostly determined by the following characteristics of
+the customer:
+* has 2-year or month-to-month contract,
+* has short tenure,
+* uses the fiber optic.
 
 ## Web app
 
-The web app displays some visualizations of the data.
-
-TBD
+IN PROGRESS
 
 ## How to run it
+
+**To run this project the [conda](https://docs.conda.io/en/latest/) package and environment manager is being used.**
 
 ### Creating the conda environment
 
@@ -220,4 +225,25 @@ Navigate to the projekt's main directory and run `jupyter lab`, then you can ope
 
 ### Pipelines
 
-TBD
+Go to the projekt's main directory.
+
+Use the following command to run the *data processing pipeline*:
+
+```bash
+python data_processing/process_data.py data/WA_Fn-UseC_-Telco-Customer-Churn.csv data/customers.db
+```
+
+as a result, you will obtain a transformed dataset which is saved in an SQL database `customers.db`.
+
+Use the following command to run the *machine learning pipeline*:
+
+```bash
+python modelling/train_classifier.py data/customers.db models/linear_reg.pkl
+```
+
+as a result, you will obtain a machine learning pipeline which is saved as a
+`linear_reg.pkl` file.
+
+### Web App
+
+IN PROGRESS
