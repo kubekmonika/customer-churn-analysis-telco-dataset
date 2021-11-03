@@ -54,11 +54,18 @@ class ModelClass:
         """Construct the model class"""
         self.model = load_model(model_filepath.replace('.pkl', ''))
         self.summary = modelling.evaluate_model(self.model, df, outcome='return')
+        self.prediction_error = self._prediction_error()
 
     def predict(self, data):
         """Get the verdict based on a new customer data"""
         prediction = predict_model(self.model, verbose=False, data=data)
         return {'verdict': prediction.loc[0, 'Label'], 'score': prediction.loc[0, 'Score']}
+
+    def _prediction_error(self):
+        """Summary of the prediction error"""
+        prediction = predict_model(self.model, verbose=False, data=df)
+        summary = prediction.groupby(['Label', 'Churn']).agg(values=('Score', 'count'))
+        return summary
 
 
 def validate_tenure(value):
@@ -131,9 +138,38 @@ def dataset_details():
 @app.route('/model_details')
 def model_details():
     """Render the model details page"""
-    # summary = modelling.evaluate_model(model, df, outcome='return')
+    predicted_yes = model.prediction_error.loc['Yes']
+    predicted_no = model.prediction_error.loc['No']
 
-    return render_template('model_details.html', summary=model.summary)
+    plot1 = gobj.Bar(
+        name='Predicted: Yes',
+        x=['Yes', 'No'],
+        y=[predicted_yes.loc['Yes', 'values'], predicted_yes.loc['No', 'values']],
+    )
+    plot2 = gobj.Bar(
+        name='Predicted: No',
+        x=['Yes', 'No'],
+        y=[predicted_no.loc['Yes', 'values'], predicted_no.loc['No', 'values']],
+    )
+    layout = {
+        'title': 'Class prediction error',
+        'xaxis': {'title': "Churn"},
+        'yaxis': {'title': "Number of predicted customers", 'automargin': True},
+        'barmode': 'stack',
+        'width': 600,
+        'height': 500,
+    }
+    graphs = [dict(data=[plot1, plot2], layout=layout)]
+
+    id = "errorplot"
+    graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return render_template(
+        'model_details.html',
+        summary=model.summary,
+        id=id,
+        graphJSON=graphJSON,
+    )
 
 
 @app.route('/prediction', methods=['GET', 'POST'])
