@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Model details{% endblock %}
+
+{% block content %}
+    <h3 class="text-center">Model: linear regression</h3>
+
+    <ul class="list-group list-group-numbered">
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <h5 class="text">Accuracy</h5>
+          How often the model prediction was correct: {{ (summary['Accuracy'] * 100)|int }}%
+        </div>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <h5 class="text">Precision</h5>
+          What proportion of positive identifications was actually correct: {{ (summary['Precision'] * 100)|int }}%
+        </div>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <h5 class="text">Recall</h5>
+          What proportion of actual positives was identified correctly: {{ (summary['Recall'] * 100)|int }}%
+        </div>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <h5 class="text">Prediction error</h5>
+          <p class="text">Churn: 0-No, 1-Yes</p>
+          <div class="text-center">
+            <img class="img-fluid" src="../../modelling/images/Prediction Error.png" alt="Class prediction error"/>
+          </div>
+        </div>
+      </li>
+    </ul>
+{% endblock %}

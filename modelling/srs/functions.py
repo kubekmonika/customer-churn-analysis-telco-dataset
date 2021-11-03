@@ -10,7 +10,7 @@ from pycaret.classification import *
 warnings.simplefilter(action='ignore')
 
 
-def evaluate_model(model, data=None):
+def evaluate_model(model, data=None, outcome='print'):
     """
     Show the summary statistics of the model. By default the test data is used,
     but you can provide other dataset.
@@ -21,7 +21,16 @@ def evaluate_model(model, data=None):
         Trained model object.
     data: pd.DataFrame, default None
         Other data to use for evaluation.
+    outcome: {'print', 'return'}, default 'print'
+        Wether to print the results or return it
+
+    Returns
+    -------
+    None, dict
+        Returns a dictionary with metrics if the outcome value is 'return'.
     """
+    assert outcome in ('print', 'return'), f"Wrong outcome value: {outcome}"
+
     if type(data) is pd.DataFrame:
         predictions = predict_model(model, verbose=False, data=data)
     else:
@@ -36,9 +45,11 @@ def evaluate_model(model, data=None):
     summary['Precision'] = metrics.precision_score(y_true, y_pred)
     summary['F1'] = metrics.f1_score(y_true, y_pred)
 
-    df = pd.DataFrame(summary, index=['Model Summary']).round(3)
-
-    print(df.to_markdown(tablefmt="grid"))
+    if outcome == 'print':
+        df = pd.DataFrame(summary, index=['Model Summary']).round(3)
+        print(df.to_markdown(tablefmt="grid"))
+    elif outcome == 'return':
+        return summary
 
 
 def load_data(database_filepath):

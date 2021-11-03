@@ -35,7 +35,7 @@ To evaluate the model we should choose metrics that are relevant to the problem 
 
 *Accuracy* is not a good metric to use in our case, because the target feature (`churn`) is not balanced throughout the dataset - 26.5% of customers are labeled as churned and 73.5% are not. This means that if we label all the customers as not churning, then we will have 73% accuracy - even though this number looks impressive, the model is useless.
 
-In our problem we want to detected as many customers who may churn as possible, so that we can act and prevent it. But on the other hand, we do not want to bother too many customers who do not plan to leave our service. Hence, we need to find a model with good balance between *precision* and *recall*, and also optimize the model for these metrics.
+In our problem we want to detected as many customers who may churn as possible, so that we can act and prevent it. But on the other hand, we do not want to bother too many customers who do not plan to leave our service. Hence, we need to find a model with good balance between *precision* and *recall*, and also optimise the model for these metrics. The *F-score* is a way of combining the precision and recall of the model, and it is defined as the harmonic mean of the model’s precision and recall. Later, the *F-score* will be used to compare models and choosing the best one.
 
 ### Project's file structure
 
@@ -43,22 +43,34 @@ TBD: poprawić strukturę plików
 
 ```
 - app
-| - template
-| |- master.html  # main page of web app
-| |- go.html  # classification result page of web app
-|- run.py  # Flask file that runs app
+| - templates
+| |- base.html
+| |- dataset_details.html
+| |- home.html  # main page of web app
+| |- model_details.html
+| |- prediction.html
+|- app.py  # Flask file that runs app
+|- EDA-report.html  # EDA report generated with DataPrep
 
 - data
 |- WA_Fn-UseC_-Telco-Customer-Churn  # data to process
-|- transformed.csv  # transformed data used to build the model
+|- transformed.csv  # transformed data in csv format
+|- customers.db  # transformed data saved to an SQL database
 
-- notebooks
-|- eda.ipynb  # Containts exploratory data analysis
-|- model.ipynb  # Contains analysis of ML models
+- data_processing
+|- srs  # package with reusable functions for this section
+|- eda.ipynb  # notebook containing detailed EDA
+|- process_data.py  # pipeline
 
-- model
-|- train_classifier.py  # script that creates the ML model
-|- classifier.pkl  # saved model 
+- modelling
+|- srs  # package with reusable functions for this section
+|- images  # images with statistics for documentation
+|- lr_pipeline_31102021.pkl  # final model created from the analysis in model.ipynb
+|- model.ipynb  # notebook containing detailed evluation of ML models
+|- train_classifier.py  # pipeline
+
+- models
+|- linear_reg.pkl  # Model used for the web app
 
 - README.md
 - requirements.txt
@@ -112,7 +124,7 @@ And here are the results:
 
 <img src="modelling/images/model_iter_02.png" alt="Models comparison - final setup" width="600"/>
 
-We see that the later setup improved the F1 score for the top three models. 
+We see that the later setup improved the F1 score for the top three models.
 
 ### Tuning models
 
@@ -181,7 +193,7 @@ Here are the statistics describing the linear regression model which was trained
 +---------------+------------+----------+-------------+-------+
 |               |   Accuracy |   Recall |   Precision |    F1 |
 +===============+============+==========+=============+=======+
-| Model Summary |      0.741 |     0.71 |       0.508 | 0.592 |
+| Model Summary |      0.760 |    0.812 |       0.517 | 0.632 |
 +---------------+------------+----------+-------------+-------+
 ```
 
@@ -197,14 +209,19 @@ The top 10 features according to their importance.
 
 <img src="modelling/images/Feature Importance.png" alt="Class prediction error" width="700"/>
 
+We can conclude that churn is mostly determined by the following characteristics of
+the customer:
+* has 2-year or month-to-month contract,
+* has short tenure,
+* uses the fiber optic.
 
 ## Web app
 
-The web app displays some visualizations of the data.
-
-TBD
+IN PROGRESS
 
 ## How to run it
+
+**To run this project the [conda](https://docs.conda.io/en/latest/) package and environment manager is being used.**
 
 ### Creating the conda environment
 
@@ -220,4 +237,25 @@ Navigate to the projekt's main directory and run `jupyter lab`, then you can ope
 
 ### Pipelines
 
-TBD
+Go to the projekt's main directory.
+
+Use the following command to run the *data processing pipeline*:
+
+```bash
+python data_processing/process_data.py data/WA_Fn-UseC_-Telco-Customer-Churn.csv data/customers.db
+```
+
+as a result, you will obtain a transformed dataset which is saved in an SQL database `customers.db`.
+
+Use the following command to run the *machine learning pipeline*:
+
+```bash
+python modelling/train_classifier.py data/customers.db models/linear_reg.pkl
+```
+
+as a result, you will obtain a machine learning pipeline which is saved as a
+`linear_reg.pkl` file.
+
+### Web App
+
+IN PROGRESS
