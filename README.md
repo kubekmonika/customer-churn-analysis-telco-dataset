@@ -215,6 +215,9 @@ the customer:
 * has short tenure,
 * uses the fiber optic.
 
+In order to obtain better results we would have to enrich this dataset with additional data
+about customers or come up with new features that would give us more relevant information.
+
 ## Web app
 
 IN PROGRESS
@@ -258,4 +261,10 @@ as a result, you will obtain a machine learning pipeline which is saved as a
 
 ### Web App
 
-IN PROGRESS
+Use the following command to run the web app:
+
+```bash
+python app/app.py data/customers.db models/linear_reg.pkl
+```
+
+and then open this address in your web browser: `http://192.168.1.37:3001/`.
