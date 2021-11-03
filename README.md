@@ -39,16 +39,15 @@ In our problem we want to detected as many customers who may churn as possible, 
 
 ### Project's file structure
 
-TBD: poprawić strukturę plików
-
 ```
 - app
-| - templates
+|- templates
 | |- base.html
 | |- dataset_details.html
 | |- home.html  # main page of web app
 | |- model_details.html
 | |- prediction.html
+|- images  # images of the web app for documentation
 |- app.py  # Flask file that runs app
 |- EDA-report.html  # EDA report generated with DataPrep
 
@@ -76,6 +75,53 @@ TBD: poprawić strukturę plików
 - requirements.txt
 - environment.yaml
 ```
+
+## How to run it
+
+**To run this project the [conda](https://docs.conda.io/en/latest/) package and environment manager is being used.**
+
+### Creating the conda environment
+
+Libraries and their versions required for replication of this analysis are listed in the `requirements.txt` file.
+
+Python version: 3.8.12
+
+Run `conda create --name <env> --file requirements.txt` to create a conda environment, and then `conda activate <env>` to activate it.
+
+### Notebooks
+
+Navigate to the projekt's main directory and run `jupyter lab`, then you can open the notebooks from within this lab environment.
+
+### Pipelines
+
+Go to the projekt's main directory.
+
+Use the following command to run the *data processing pipeline*:
+
+```bash
+python data_processing/process_data.py data/WA_Fn-UseC_-Telco-Customer-Churn.csv data/customers.db
+```
+
+as a result, you will obtain a transformed dataset which is saved in an SQL database `customers.db`.
+
+Use the following command to run the *machine learning pipeline*:
+
+```bash
+python modelling/train_classifier.py data/customers.db models/linear_reg.pkl
+```
+
+as a result, you will obtain a machine learning pipeline which is saved as a
+`linear_reg.pkl` file.
+
+### Web App
+
+Use the following command to run the web app:
+
+```bash
+python app/app.py data/customers.db models/linear_reg.pkl
+```
+
+and then open this address in your web browser: `http://192.168.1.37:3001/`.
 
 ## Exploratory data analysis (EDA)
 
@@ -215,47 +261,32 @@ the customer:
 * has short tenure,
 * uses the fiber optic.
 
+In order to obtain better results we would have to enrich this dataset with additional data
+about customers or come up with new features that would give us more relevant information.
+
 ## Web app
 
-IN PROGRESS
+<img src="app/images/home.png" alt="Home Page" width="600"/>
 
-## How to run it
+When you open the web app, you will see a home page with a short introduction. There
+will be also three navigation buttons that will redirect you to other secions.
 
-**To run this project the [conda](https://docs.conda.io/en/latest/) package and environment manager is being used.**
+##### Dataset details
 
-### Creating the conda environment
+Here you will see a description of the dataset as well as a graphical summary of it.
 
-Libraries and their versions required for replication of this analysis are listed in the `requirements.txt` file.
+<img src="app/images/dataset.png" alt="Home Page" width="600"/>
 
-Python version: 3.8.12
+##### Model summary
 
-Run `conda create --name <env> --file requirements.txt` to create a conda environment, and then `conda activate <env>` to activate it.
+Here you will see basic statistics of the model.
 
-### Notebooks
+<img src="app/images/model.png" alt="Home Page" width="600"/>
 
-Navigate to the projekt's main directory and run `jupyter lab`, then you can open the notebooks from within this lab environment.
+##### Make your own prediction
 
-### Pipelines
+In this section you will find a form with customer characteristics. When you fill this form and click the `Submit data` button, you will be presented with a prediction result for the provided characteristics.
 
-Go to the projekt's main directory.
+<img src="app/images/prediction_form.png" alt="Home Page" width="600"/>
 
-Use the following command to run the *data processing pipeline*:
-
-```bash
-python data_processing/process_data.py data/WA_Fn-UseC_-Telco-Customer-Churn.csv data/customers.db
-```
-
-as a result, you will obtain a transformed dataset which is saved in an SQL database `customers.db`.
-
-Use the following command to run the *machine learning pipeline*:
-
-```bash
-python modelling/train_classifier.py data/customers.db models/linear_reg.pkl
-```
-
-as a result, you will obtain a machine learning pipeline which is saved as a
-`linear_reg.pkl` file.
-
-### Web App
-
-IN PROGRESS
+<img src="app/images/prediction_result.png" alt="Home Page" width="600"/>
