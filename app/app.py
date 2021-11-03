@@ -51,23 +51,86 @@ NUMERICAL_FEATURES_STATS = {
 
 class ModelClass:
     def __init__(self, model_filepath):
+        """Construct the model class"""
         self.model = load_model(model_filepath.replace('.pkl', ''))
         self.summary = modelling.evaluate_model(self.model, df, outcome='return')
+
+    def predict(self, data):
+        """Get the verdict based on a new customer data"""
+        prediction = predict_model(self.model, verbose=False, data=data)
+        return {'verdict': prediction.loc[0, 'Label'], 'score': prediction.loc[0, 'Score']}
+
+
+def validate_tenure(value):
+    """Validate the tenure value"""
+    if value < 0:
+        raise ValueError
+    elif value > 72:
+        raise ValueError
+    else:
+        return value
+
+
+def validate_charges(value):
+    """Validate the monthly charges value"""
+    if value < 18.25:
+        raise ValueError
+    elif value > 118.75:
+        raise ValueError
+    else:
+        return value
+
+
+def form_to_input_data(form):
+    """Create a data frame that will be an input data for the model"""
+    phone_service_flag = 'PhoneServiceEnabled' in form.keys()
+    internet_service_flag = 'InternetServiceEnabled' in form.keys()
+
+    tenure_value = validate_tenure(int(form['Tenure']))
+    monthly_charges_value = validate_charges(float(form['MonthlyCharges']))
+
+    input_data_dict = {
+        'Gender': form['Gender'],
+        'SeniorCitizen': form['SeniorCitizen'],
+        'Partner': form['Partner'],
+        'Dependents': form['Dependents'],
+        'Tenure': tenure_value,
+        'PhoneService': 'Yes' if phone_service_flag else 'No',
+        'MultipleLines': form['MultipleLines'] if phone_service_flag else 'No phone service',
+        'InternetService': form['InternetService'] if internet_service_flag else 'No',
+        'OnlineSecurity': form['OnlineSecurity'] if internet_service_flag else 'No internet service',
+        'OnlineBackup': form['OnlineBackup'] if internet_service_flag else 'No internet service',
+        'DeviceProtection': form['DeviceProtection'] if internet_service_flag else 'No internet service',
+        'TechSupport': form['TechSupport'] if internet_service_flag else 'No internet service',
+        'StreamingTV': form['StreamingTV'] if internet_service_flag else 'No internet service',
+        'StreamingMovies': form['StreamingMovies'] if internet_service_flag else 'No internet service',
+        'Contract': form['Contract'],
+        'PaperlessBilling': form['PaperlessBilling'],
+        'PaymentMethod': form['PaymentMethod'],
+        'MonthlyCharges': monthly_charges_value,
+        'Churn': None,
+    }
+    input_data_df = pd.Series(input_data_dict).to_frame().T
+
+    return input_data_df
 
 
 @app.route('/')
 @app.route('/index')
 def index():
+    """Render the home page"""
     return render_template('home.html')
 
 
 @app.route('/dataset_details')
 def dataset_details():
+    """Render the dataset details page"""
     return render_template('dataset_details.html')
 
 
 @app.route('/model_details')
 def model_details():
+    """Render the model details page"""
     # summary = modelling.evaluate_model(model, df, outcome='return')
 
     return render_template('model_details.html', summary=model.summary)
@@ -75,6 +138,7 @@ def model_details():
 
 @app.route('/prediction', methods=['GET', 'POST'])
 def prediction():
+    """Render the prediction page"""
     if request.method == 'GET':
         return render_template(
             'prediction.html',
@@ -84,15 +148,29 @@ def prediction():
             numerical_f=NUMERICAL_FEATURES_STATS,
         )
     elif request.method == 'POST':
-        customer_details = request.form
-        return render_template(
-            'prediction.html',
-            basic_f=BASIC_FEATURES_UNIQUE_VALUES,
-            phone_f=PHONE_FEATURES_UNIQUE_VALUES,
-            internet_f=INTERNET_FEATURES_UNIQUE_VALUES,
-            numerical_f=NUMERICAL_FEATURES_STATS,
-            prediction=customer_details,
-        )
+        try:
+            input_data = form_to_input_data(request.form)
+            input_data_tuple = [(key, val[0]) for key, val in input_data.items()]
+            input_data = data_processing.transform_data(input_data)
+            prediction = model.predict(input_data)
+            return render_template(
+                'prediction.html',
+                basic_f=BASIC_FEATURES_UNIQUE_VALUES,
+                phone_f=PHONE_FEATURES_UNIQUE_VALUES,
+                internet_f=INTERNET_FEATURES_UNIQUE_VALUES,
+                numerical_f=NUMERICAL_FEATURES_STATS,
+                prediction=prediction,
+                data_summary=input_data_tuple,
+            )
+        except ValueError:
+            return render_template(
+                'prediction.html',
+                basic_f=BASIC_FEATURES_UNIQUE_VALUES,
+                phone_f=PHONE_FEATURES_UNIQUE_VALUES,
+                internet_f=INTERNET_FEATURES_UNIQUE_VALUES,
+                numerical_f=NUMERICAL_FEATURES_STATS,
+                validation="Please provide correct values for Tenure and MonthlyCharges",
+            )
     else:
         raise Exception('Wrong method')
 
