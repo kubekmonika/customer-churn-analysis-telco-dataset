@@ -43,22 +43,34 @@ TBD: poprawić strukturę plików
 
 ```
 - app
-| - template
-| |- master.html  # main page of web app
-| |- go.html  # classification result page of web app
-|- run.py  # Flask file that runs app
+| - templates
+| |- base.html
+| |- dataset_details.html
+| |- home.html  # main page of web app
+| |- model_details.html
+| |- prediction.html
+|- app.py  # Flask file that runs app
+|- EDA-report.html  # EDA report generated with DataPrep
 
 - data
 |- WA_Fn-UseC_-Telco-Customer-Churn  # data to process
-|- transformed.csv  # transformed data used to build the model
+|- transformed.csv  # transformed data in csv format
+|- customers.db  # transformed data saved to an SQL database
 
-- notebooks
-|- eda.ipynb  # Containts exploratory data analysis
-|- model.ipynb  # Contains analysis of ML models
+- data_processing
+|- srs  # package with reusable functions for this section
+|- eda.ipynb  # notebook containing detailed EDA
+|- process_data.py  # pipeline
 
-- model
-|- train_classifier.py  # script that creates the ML model
-|- classifier.pkl  # saved model
+- modelling
+|- srs  # package with reusable functions for this section
+|- images  # images with statistics for documentation
+|- lr_pipeline_31102021.pkl  # final model created from the analysis in model.ipynb
+|- model.ipynb  # notebook containing detailed evluation of ML models
+|- train_classifier.py  # pipeline
+
+- models
+|- linear_reg.pkl  # Model used for the web app
 
 - README.md
 - requirements.txt
