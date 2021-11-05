@@ -2,32 +2,27 @@
 
 *This is a capstone project made for the Udacity's Data Scientist Nanodegree program.*
 
-## Introduction
+## Writeup
 
-### What is churn?
+### Project overview
 
-Churn is the phenomenon where customers stop using your product. It is often presented as a metric that quantifies how many people have stopped using your service over a specific time period. This kind of analysis is important as it helps you find indicators of lower engagement and spot the people who may leave. Using such insights you can improve your service and offers which will lead to better user retention.
+Churn is the phenomenon where customers stop using your product. It is widely known in business that it it easier to keep an existing customer than to gain a new one. Similarly, it is also easier to save a customer before they leave than to convince them to come back. Hence, understanding and preventing customer churn is a crucial task and every business should allocate some part of their resources to work on it. Customer churn analysis helps in finding indicators of churn. Using such insights you can improve your service and offers which will lead to better user retention.
 
-### Dataset
-
-The *Telco customer churn* data contains information about a fictional telecommunications company that provided home phone and Internet services.
-
-Source: [Kaggle](https://www.kaggle.com/blastchar/telco-customer-churn)
-
-Each row represents a customer, each column contains customer’s attributes.
-
-The data set includes information about:
+In this project I will take on a role of a data scientist that works for Telco, which is a fictional telecommunications company that provides home phone and Internet services. I am provided with a dataset of current and former customers, that contains information about:
 
 * Customers who left within the last month – the column is called Churn
 * Services that each customer has signed up for – phone, multiple lines, internet, online security, online backup, device protection, tech support, and streaming TV and movies
 * Customer account information – how long they’ve been a customer, contract, payment method, paperless billing, monthly charges, and total charges
 * Demographic info about customers – gender, age range, and if they have partners and dependents
 
-### The aim of this project
+Source of the data: [Kaggle](https://www.kaggle.com/blastchar/telco-customer-churn)
 
-1. Do exploratory data analysis of the dataset.
-2. Build a binary classification model that will predict customer churn.
-3. Build a web application that will allow to make predictions based on entered data.
+### Problem statement
+
+In order to help the company in retaining the customers I need to:
+
+1. Build a binary classification model that will predict which customers may churn. - Such model can be used for example to predict what will happen in the near future. Knowing what churn we expect to see will help in building business strategy.
+2. Build a web application that will allow to make predictions based on entered data. - One data scientist is a bottleneck when there are many stakeholders who need data. Such an application will be helpful for example for the team who works closely with individual customers. When they know the probability of churn of a given customer, they may act accordingly and customize the offer.
 
 ### Evaluation metrics
 
@@ -35,135 +30,72 @@ To evaluate the model we should choose metrics that are relevant to the problem 
 
 *Accuracy* is not a good metric to use in our case, because the target feature (`churn`) is not balanced throughout the dataset - 26.5% of customers are labeled as churned and 73.5% are not. This means that if we label all the customers as not churning, then we will have 73% accuracy - even though this number looks impressive, the model is useless.
 
-In our problem we want to detected as many customers who may churn as possible, so that we can act and prevent it. But on the other hand, we do not want to bother too many customers who do not plan to leave our service. Hence, we need to find a model with good balance between *precision* and *recall*, and also optimise the model for these metrics. The *F-score* is a way of combining the precision and recall of the model, and it is defined as the harmonic mean of the model’s precision and recall. Later, the *F-score* will be used to compare models and choosing the best one.
+In our problem we want to detected as many customers who may churn as possible, so that we can act and prevent it (that is *precision*). On the other hand, we do not want to bother too many customers who do not plan to leave our service (that is *recall*). Hence, we need to find a model with good balance between *precision* and *recall*, and also optimise the model for these metrics. The *F-score* is a way of combining the precision and recall of the model, and it is defined as the harmonic mean of the model’s precision and recall. Later, the *F-score* will be used to compare models and choosing one.
 
-### Project's file structure
+### Analysis
 
-```
-- app
-|- templates
-| |- base.html
-| |- dataset_details.html
-| |- home.html  # main page of web app
-| |- model_details.html
-| |- prediction.html
-|- images  # images of the web app for documentation
-|- app.py  # Flask file that runs app
-|- EDA-report.html  # EDA report generated with DataPrep
+The exploratory data analysis (EDA) is summarised in the `eda.ipynb` notebook which can be found in the `data_processing` directory.
 
-- data
-|- WA_Fn-UseC_-Telco-Customer-Churn  # data to process
-|- transformed.csv  # transformed data in csv format
-|- customers.db  # transformed data saved to an SQL database
+### Data preprocessing
 
-- data_processing
-|- srs  # package with reusable functions for this section
-|- eda.ipynb  # notebook containing detailed EDA
-|- process_data.py  # pipeline
+Based on the EDA I made a decision to transform some of the features.
 
-- modelling
-|- srs  # package with reusable functions for this section
-|- images  # images with statistics for documentation
-|- lr_pipeline_31102021.pkl  # final model created from the analysis in model.ipynb
-|- model.ipynb  # notebook containing detailed evluation of ML models
-|- train_classifier.py  # pipeline
+I decided to skip the `Total Charges` feature as it is highly correlated with `Tenure` (correlation 0.73), and when we combine `Tenure` with `Monthly Charges` we basically get the same information.
 
-- models
-|- linear_reg.pkl  # Model used for the web app
+The numeric characteristics of the customers can be divided into ranges related to lower or higher churn. Hence, I decided to replace them with buckets as follows:
+* `Tenure` values are divided into following ranges:
+  * 0-20: related to high churn
+  * 21-50: related to medium churn
+  * 50+: related to low churn
+* `Monthly Charges` values are divided into following ranges:
+  * 0-40: with low churn
+  * 41-60: with medium churn
+  * 60+: with high churn
 
-- README.md
-- requirements.txt
-- environment.yaml
-```
+For the `Multiple Lines` feature I grouped two categories, `No multiple lines` and `No phone service`, into one `Other`, as they did not have a significant difference in their relation to churn.
 
-## How to run it
+And finally, I created a new feature that indicates a total number of internet services a customer has.
 
-**To run this project the [conda](https://docs.conda.io/en/latest/) package and environment manager is being used.**
+In the end, the following set of features was chosen to build the model:
+* `Gender`: The customer’s gender: Male, Female
+* `Senior Citizen`: Indicates if the customer is 65 or older: Yes, No
+* `Partner`: Indicates if the customer is a partner: Yes, No
+* `Dependents`: Indicates if the customer lives with any dependents: Yes, No. Dependents could be children, parents, grandparents, etc.
+* `Phone Service`: Indicates if the customer subscribes to home phone service with the company: Yes, No
+* `Internet Service`: Indicates if the customer subscribes to Internet service with the company: No, DSL, Fiber Optic, Cable.
+* `Online Security`: Indicates if the customer subscribes to an additional online security service provided by the company: Yes, No
+* `Online Backup`: Indicates if the customer subscribes to an additional online backup service provided by the company: Yes, No
+* `Device Protection Plan`: Indicates if the customer subscribes to an additional device protection plan for their Internet equipment provided by the company: Yes, No
+* `Tech Support`: Indicates if the customer subscribes to an additional technical support plan from the company with reduced wait times: Yes, No
+* `Streaming TV`: Indicates if the customer uses their Internet service to stream television programing from a third party provider: Yes, No. The company does not charge an additional fee for this service
+* `Streaming Movies`: Indicates if the customer uses their Internet service to stream movies from a third party provider: Yes, No. The company does not charge an additional fee for this service
+* `Contract`: Indicates the customer’s current contract type: Month-to-Month, One Year, Two Year
+* `Paperless Billing`: Indicates if the customer has chosen paperless billing: Yes, No
+* `Payment Method`: Indicates how the customer pays their bill: Bank Withdrawal, Credit Card, Mailed Check
+* `Tenure Buckets`: Indicates the range in which the customer's tenure value is, it is denoted in months: 0-20, 21-50, 50+
+* `Monthly Charges Buckets`: Indicates a range in which the customer’s current total monthly charge is for all their services from the company: 0-40, 41-60, 60+
+* `Multiple Lines Buckets`: Indicates if the customer subscribes to multiple telephone lines with the company: Yes; either has one line or not at all: Other
+* `Num Internet Services`: Indicates the total number of additional internet services the customer has: 0 - 6
+* `Churn`: Indicates if the customer have churned: Yes, No
 
-### Creating the conda environment
+### Implementation and refinement
 
-Libraries and their versions required for replication of this analysis are listed in the `requirements.txt` file.
+The dataset is split into three parts:
+* train - to train the models,
+* test - to test the trained models,
+* validation - to perform the final validation of the model's performance on previously unseen data.
 
-Python version: 3.8.12
+In training all the models, the 5-fold cross-validation is used. We do not need to perform any imputation method, as no missing values occur in this dataset.
 
-Run `conda create --name <env> --file requirements.txt` to create a conda environment, and then `conda activate <env>` to activate it.
-
-### Notebooks
-
-Navigate to the projekt's main directory and run `jupyter lab`, then you can open the notebooks from within this lab environment.
-
-### Pipelines
-
-Go to the projekt's main directory.
-
-Use the following command to run the *data processing pipeline*:
-
-```bash
-python data_processing/process_data.py data/WA_Fn-UseC_-Telco-Customer-Churn.csv data/customers.db
-```
-
-as a result, you will obtain a transformed dataset which is saved in an SQL database `customers.db`.
-
-Use the following command to run the *machine learning pipeline*:
-
-```bash
-python modelling/train_classifier.py data/customers.db models/linear_reg.pkl
-```
-
-as a result, you will obtain a machine learning pipeline which is saved as a
-`linear_reg.pkl` file.
-
-### Web App
-
-Use the following command to run the web app:
-
-```bash
-python app/app.py data/customers.db models/linear_reg.pkl
-```
-
-and then open this address in your web browser: `http://192.168.1.37:3001/`.
-
-## Exploratory data analysis (EDA)
-
-The detailed EDA is available in the `eda.ipynb` notebook.
-
-As a result of the EDA, the following set of features was chosen to build the model:
-* Gender: The customer’s gender: Male, Female
-* Senior Citizen: Indicates if the customer is 65 or older: Yes, No
-* Partner: Indicates if the customer is a partner: Yes, No
-* Dependents: Indicates if the customer lives with any dependents: Yes, No. Dependents could be children, parents, grandparents, etc.
-* Phone Service: Indicates if the customer subscribes to home phone service with the company: Yes, No
-* Internet Service: Indicates if the customer subscribes to Internet service with the company: No, DSL, Fiber Optic, Cable.
-* Online Security: Indicates if the customer subscribes to an additional online security service provided by the company: Yes, No
-* Online Backup: Indicates if the customer subscribes to an additional online backup service provided by the company: Yes, No
-* Device Protection Plan: Indicates if the customer subscribes to an additional device protection plan for their Internet equipment provided by the company: Yes, No
-* Tech Support: Indicates if the customer subscribes to an additional technical support plan from the company with reduced wait times: Yes, No
-* Streaming TV: Indicates if the customer uses their Internet service to stream television programing from a third party provider: Yes, No. The company does not charge an additional fee for this service
-* Streaming Movies: Indicates if the customer uses their Internet service to stream movies from a third party provider: Yes, No. The company does not charge an additional fee for this service
-* Contract: Indicates the customer’s current contract type: Month-to-Month, One Year, Two Year
-* Paperless Billing: Indicates if the customer has chosen paperless billing: Yes, No
-* Payment Method: Indicates how the customer pays their bill: Bank Withdrawal, Credit Card, Mailed Check
-* Tenure Buckets: Indicates the range in which the customer's tenure value is, it is denoted in months: 0-20, 21-50, 50+
-* Monthly Charges Buckets: Indicates a range in which the customer’s current total monthly charge is for all their services from the company: 0-40, 41-60, 60+
-* Multiple Lines Buckets: Indicates if the customer subscribes to multiple telephone lines with the company: Yes; either has one line or not at all: Other
-* Num Internet Services: Indicates the total number of additional internet services the customer has: 0 - 6
-* Churn: Indicates if the customer have churned: Yes, No
-
-## Model
-
-In training all the models, the 5-fold cross-validation is used. We do not need to perform any imputation method, as no missing values occure in this datasest.
-
-### Initial results
+To quickly iterate through various models I used the [PyCaret](https://pycaret.org/) library. It is an open-source, low-code machine learning library in Python that automates machine learning workflows.
 
 With basic setup the results looked as follows:
 
 <img src="modelling/images/model_iter_01.png" alt="Models comparison - basic setup" width="600"/>
 
-### Improving the setup
-
-After testing some tweaks, I ended with the following configuration:
+After testing some tweaks, I found that the best results gives the following configuration:
 * the feature `NumInternetServices` is chosen to be numerical, the rest is categorical,
-* the numeric feature is normalized, the `z-score` normalization is used,
+* the numeric feature is normalised, the `z-score` normalisation is used,
 * SMOTE method is used to fix the imbalance.
 
 And here are the results:
@@ -172,20 +104,19 @@ And here are the results:
 
 We see that the later setup improved the F1 score for the top three models.
 
-### Tuning models
+After settling on the features, I moved to the next step which is tuning the hyper-parameters.
+Firstly, I searched for best parameters. Secondly, I tested the models on test data.
 
-The detailed analysis of the tuning results is available in the `model.ipynb` notebook.
-
-Here are the results obtained when validating the models.
+Here are the statistics of the tuned models.
 
 **Logistic regression**
 
 ```md
-+---------------+------------+----------+-------------+------+
-|               |   Accuracy |   Recall |   Precision |   F1 |
-+===============+============+==========+=============+======+
-| Model Summary |      0.743 |    0.731 |       0.509 |0.600 |
-+---------------+------------+----------+-------------+------+
++---------------+------------+----------+-------------+-------+
+|               |   Accuracy |   Recall |   Precision |    F1 |
++===============+============+==========+=============+=======+
+| Model Summary |      0.765 |    0.825 |       0.557 | 0.665 |
++---------------+------------+----------+-------------+-------+
 ```
 
 **Ridge classifier**
@@ -194,8 +125,9 @@ Here are the results obtained when validating the models.
 +---------------+------------+----------+-------------+-------+
 |               |   Accuracy |   Recall |   Precision |    F1 |
 +===============+============+==========+=============+=======+
-| Model Summary |      0.746 |    0.742 |       0.513 | 0.607 |
+| Model Summary |      0.763 |    0.833 |       0.554 | 0.665 |
 +---------------+------------+----------+-------------+-------+
+
 ```
 
 **Linear SVM**
@@ -204,7 +136,7 @@ Here are the results obtained when validating the models.
 +---------------+------------+----------+-------------+-------+
 |               |   Accuracy |   Recall |   Precision |    F1 |
 +===============+============+==========+=============+=======+
-| Model Summary |      0.709 |    0.753 |       0.468 | 0.577 |
+| Model Summary |      0.694 |    0.914 |       0.479 | 0.628 |
 +---------------+------------+----------+-------------+-------+
 ```
 
@@ -214,7 +146,7 @@ Here are the results obtained when validating the models.
 +---------------+------------+----------+-------------+-------+
 |               |   Accuracy |   Recall |   Precision |    F1 |
 +===============+============+==========+=============+=======+
-| Model Summary |      0.733 |    0.694 |       0.496 | 0.578 |
+| Model Summary |      0.766 |    0.774 |       0.563 | 0.652 |
 +---------------+------------+----------+-------------+-------+
 ```
 
@@ -224,23 +156,20 @@ Here are the results obtained when validating the models.
 +---------------+------------+----------+-------------+-------+
 |               |   Accuracy |   Recall |   Precision |    F1 |
 +===============+============+==========+=============+=======+
-| Model Summary |      0.722 |    0.613 |       0.479 | 0.538 |
+| Model Summary |      0.763 |    0.769 |        0.56 | 0.648 |
 +---------------+------------+----------+-------------+-------+
 ```
 
-The logistic regression and the Ridge classifier give similar best results. I choose the logistic regression as the final model for the problem.
+All the models give similar results when it comes to F-score. I choose the logistic regression as the final model for the problem - it is a simple model which is easy to interpret and can be trained quickly.
 
-
-### The final model
-
-Here are the statistics describing the linear regression model which was trained using the entire train+test dataset and validated on unseed data:
+Here are the statistics describing the linear regression model which was trained using the entire train+test dataset and validated on unseen data:
 
 ```md
-+---------------+------------+----------+-------------+-------+
-|               |   Accuracy |   Recall |   Precision |    F1 |
-+===============+============+==========+=============+=======+
-| Model Summary |      0.760 |    0.812 |       0.517 | 0.632 |
-+---------------+------------+----------+-------------+-------+
++---------------+------------+----------+-------------+------+
+|               |   Accuracy |   Recall |   Precision |   F1 |
++===============+============+==========+=============+======+
+| Model Summary |      0.744 |    0.726 |       0.511 |  0.6 |
++---------------+------------+----------+-------------+------+
 ```
 
 The visualisation of the class prediction error, where `1` means *churned* and `0` means *not churned*.
@@ -257,9 +186,9 @@ The top 10 features according to their importance.
 
 We can conclude that churn is mostly determined by the following characteristics of
 the customer:
-* has 2-year or month-to-month contract,
-* has short tenure,
-* uses the fiber optic.
+* has short tenure (high churn),
+* uses the fiber optic (high churn),
+* the contract is month-to-month (high churn) or two-year (low churn).
 
 In order to obtain better results we would have to enrich this dataset with additional data
 about customers or come up with new features that would give us more relevant information.
