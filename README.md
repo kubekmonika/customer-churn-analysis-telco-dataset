@@ -34,7 +34,7 @@ In our problem we want to detected as many customers who may churn as possible, 
 
 ### Analysis
 
-The exploratory data analysis (EDA) is summarised in the `eda.ipynb` notebook which can be found in the `data_processing` directory.
+The exploratory data analysis (EDA) is summarised in the `eda.ipynb` notebook which also was converted to a PDF file `eda.pdf`. Both files can be found in the `data_processing` directory.
 
 ### Data preprocessing
 
