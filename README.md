@@ -32,53 +32,189 @@ To evaluate the model we should choose metrics that are relevant to the problem 
 
 In our problem we want to detected as many customers who may churn as possible, so that we can act and prevent it (that is *precision*). On the other hand, we do not want to bother too many customers who do not plan to leave our service (that is *recall*). Hence, we need to find a model with good balance between *precision* and *recall*, and also optimise the model for these metrics. The *F-score* is a way of combining the precision and recall of the model, and it is defined as the harmonic mean of the model’s precision and recall. Later, the *F-score* will be used to compare models and choosing one.
 
-### Analysis
+### Data Exploration
 
-The exploratory data analysis (EDA) is summarised in the `eda.ipynb` notebook which also was converted to a PDF file `eda.pdf`. Both files can be found in the `data_processing` directory.
+Below you will find customer characteristcs reported in the dataset with visualisation of their distribution, some statistics, and association with churn.
+
+##### Numerical
+* `Tenure` How long they’ve been a customer (in months)
+* `Monthly Charge` Indicates the customer’s current total monthly charge for all their services from the company
+* `Total Charges` Indicates the customer’s total charges
+
+<img src="data_processing/images/stats_numerical.png" width="300"/>
+
+##### Categorical
+* `Gender` The customer’s gender: *Male, Female*
+| Gender   |   Share of churned customers |
+|:---------|-----------------------------:|
+| Female   |                     0.269209 |
+| Male     |                     0.261603 |
+* `Senior Citizen` Indicates if the customer is 65 or older: *Yes, No*
+| SeniorCitizen   |   Share of churned customers |
+|:----------------|-----------------------------:|
+| No              |                     0.236062 |
+| Yes             |                     0.416813 |
+* `Partner` Indicates if the customer is a partner: *Yes, No*
+| Partner   |   Share of churned customers |
+|:----------|-----------------------------:|
+| No        |                     0.32958  |
+| Yes       |                     0.196649 |
+* `Dependents` Indicates if the customer lives with any dependents (could be children, parents, grandparents): *Yes, No*
+| Dependents   |   Share of churned customers |
+|:-------------|-----------------------------:|
+| No           |                     0.312791 |
+| Yes          |                     0.154502 |
+
+* `Phone Service` Indicates if the customer subscribes to home phone service with the company: *Yes, No*
+| PhoneService   |   Share of churned customers |
+|:---------------|-----------------------------:|
+| No             |                     0.249267 |
+| Yes            |                     0.267096 |
+* `Multiple Lines` Indicates if the customer subscribes to multiple telephone lines with the company: *Yes, No*
+| MultipleLines    |   Share of churned customers |
+|:-----------------|-----------------------------:|
+| No               |                     0.250442 |
+| No phone service |                     0.249267 |
+| Yes              |                     0.286099 |
+* `Internet Service` Indicates if the customer subscribes to Internet service with the company: *No, DSL, Fiber Optic, Cable*
+| InternetService   |   Share of churned customers |
+|:------------------|-----------------------------:|
+| DSL               |                    0.189591  |
+| Fiber optic       |                    0.418928  |
+| No                |                    0.0740498 |
+* `Online Security` Indicates if the customer subscribes to an additional online security service provided by the company: *Yes, No*
+| 'InternetService', 'OnlineSecurity' |   Share of churned customers |
+|:------------------------------|-----------------------------:|
+| ('DSL', 'No')                 |                    0.279613  |
+| ('DSL', 'Yes')                |                    0.0949153 |
+| ('Fiber optic', 'No')         |                    0.493576  |
+| ('Fiber optic', 'Yes')        |                    0.218117  |
+| ('No', 'No internet service') |                    0.0740498 |
+* `Online Backup` Indicates if the customer subscribes to an additional online backup service provided by the company: *Yes, No*
+| 'InternetService', 'OnlineBackup'|   Share of churned customers |
+|:------------------------------|-----------------------------:|
+| ('DSL', 'No')                 |                    0.256929  |
+| ('DSL', 'Yes')                |                    0.106814  |
+| ('Fiber optic', 'No')         |                    0.507701  |
+| ('Fiber optic', 'Yes')        |                    0.303053  |
+| ('No', 'No internet service') |                    0.0740498 |
+* `Device Protection Plan` Indicates if the customer subscribes to an additional device protection plan for their Internet equipment provided by the company: *Yes, No*
+| 'InternetService', 'DeviceProtection'|   Share of churned customers |
+|:------------------------------|-----------------------------:|
+| ('DSL', 'No')                 |                    0.256929  |
+| ('DSL', 'Yes')                |                    0.106814  |
+| ('Fiber optic', 'No')         |                    0.507701  |
+| ('Fiber optic', 'Yes')        |                    0.303053  |
+| ('No', 'No internet service') |                    0.0740498 |
+* `Tech Support` Indicates if the customer subscribes to an additional technical support plan from the company with reduced wait times: *Yes, No*
+| 'InternetService', 'TechSupport' |   Share of churned customers |
+|:------------------------------|-----------------------------:|
+| ('DSL', 'No')                 |                    0.277554  |
+| ('DSL', 'Yes')                |                    0.0967742 |
+| ('Fiber optic', 'No')         |                    0.493722  |
+| ('Fiber optic', 'Yes')        |                    0.226328  |
+| ('No', 'No internet service') |                    0.0740498 |
+* `Streaming TV` Indicates if the customer uses their Internet service to stream television programing from a third party provider: *Yes, No*
+| 'InternetService', 'StreamingTV' |   Share of churned customers |
+|:------------------------------|-----------------------------:|
+| ('DSL', 'No')                 |                    0.226776  |
+| ('DSL', 'Yes')                |                    0.132706  |
+| ('Fiber optic', 'No')         |                    0.453195  |
+| ('Fiber optic', 'Yes')        |                    0.392571  |
+| ('No', 'No internet service') |                    0.0740498 |
+* `Streaming Movies` Indicates if the customer uses their Internet service to stream movies from a third party provider: *Yes, No*
+| 'InternetService', 'StreamingMovies'|   Share of churned customers |
+|:------------------------------|-----------------------------:|
+| ('DSL', 'No')                 |                    0.223611  |
+| ('DSL', 'Yes')                |                    0.139653  |
+| ('Fiber optic', 'No')         |                    0.457993  |
+| ('Fiber optic', 'Yes')        |                    0.388921  |
+| ('No', 'No internet service') |                    0.0740498 |
+* `Contract` Indicates the customer’s current contract type: *Month-to-Month, One Year, Two Year*
+| Contract       |   Share of churned customers |
+|:---------------|-----------------------------:|
+| Month-to-month |                    0.427097  |
+| One year       |                    0.112695  |
+| Two year       |                    0.0283186 |
+* `Paperless Billing` Indicates if the customer has chosen paperless billing: *Yes, No*
+| PaperlessBilling   |   Share of churned customers |
+|:-------------------|-----------------------------:|
+| No                 |                     0.163301 |
+| Yes                |                     0.335651 |
+* `Payment Method` Indicates how the customer pays their bill: *Bank Withdrawal, Credit Card, Mailed Check*
+| PaymentMethod             |   Share of churned customers |
+|:--------------------------|-----------------------------:|
+| Bank transfer (automatic) |                     0.167098 |
+| Credit card (automatic)   |                     0.152431 |
+| Electronic check          |                     0.452854 |
+| Mailed check              |                     0.191067 |
+* `Churn` Indicates if the customer have churned: *Yes, No*
+
+### Data Visualisation
+
+All the features are presented in the visual form here.
+
+<img src="data_processing/images/dist_numerical.png" width="600"/>
+<img src="data_processing/images/dist_objects_1.png" width="600"/>
+<img src="data_processing/images/dist_objects_2.png" width="600"/>
+<img src="data_processing/images/dist_objects_3.png" width="600"/>
 
 ### Data preprocessing
 
-Based on the EDA I made a decision to transform some of the features.
+Based on the further EDA I made a decision to transform some of the features.
 
-I decided to skip the `Total Charges` feature as it is highly correlated with `Tenure` (correlation 0.73), and when we combine `Tenure` with `Monthly Charges` we basically get the same information.
+<img src="data_processing/images/corr_tenure_totalcharges.png" width="400"/>
 
-The numeric characteristics of the customers can be divided into ranges related to lower or higher churn. Hence, I decided to replace them with buckets as follows:
+I decided to skip the `Total Charges` feature as it is highly correlated with `Tenure` (correlation 0.73), and when we multiply `Tenure` by `Monthly Charges` we basically get the same information as `Total Charges`.
+
+The numeric characteristics of the customers can be divided into ranges related to lower or higher churn. Hence, I decided to replace them with buckets as follows.
+
+<img src="data_processing/images/dist_tenure.png" width="400"/>
+
 * `Tenure` values are divided into following ranges:
   * 0-20: related to high churn
   * 21-50: related to medium churn
   * 50+: related to low churn
+
+<img src="data_processing/images/dist_monthlycharges.png" width="400"/>
+
 * `Monthly Charges` values are divided into following ranges:
   * 0-40: with low churn
   * 41-60: with medium churn
   * 60+: with high churn
 
+<img src="data_processing/images/churn_multiplelines.png" width="300"/>
+
 For the `Multiple Lines` feature I grouped two categories, `No multiple lines` and `No phone service`, into one `Other`, as they did not have a significant difference in their relation to churn.
 
 And finally, I created a new feature that indicates a total number of internet services a customer has.
 
-In the end, the following set of features was chosen to build the model:
-* `Gender`: The customer’s gender: Male, Female
-* `Senior Citizen`: Indicates if the customer is 65 or older: Yes, No
-* `Partner`: Indicates if the customer is a partner: Yes, No
-* `Dependents`: Indicates if the customer lives with any dependents: Yes, No. Dependents could be children, parents, grandparents, etc.
-* `Phone Service`: Indicates if the customer subscribes to home phone service with the company: Yes, No
-* `Internet Service`: Indicates if the customer subscribes to Internet service with the company: No, DSL, Fiber Optic, Cable.
-* `Online Security`: Indicates if the customer subscribes to an additional online security service provided by the company: Yes, No
-* `Online Backup`: Indicates if the customer subscribes to an additional online backup service provided by the company: Yes, No
-* `Device Protection Plan`: Indicates if the customer subscribes to an additional device protection plan for their Internet equipment provided by the company: Yes, No
-* `Tech Support`: Indicates if the customer subscribes to an additional technical support plan from the company with reduced wait times: Yes, No
-* `Streaming TV`: Indicates if the customer uses their Internet service to stream television programing from a third party provider: Yes, No. The company does not charge an additional fee for this service
-* `Streaming Movies`: Indicates if the customer uses their Internet service to stream movies from a third party provider: Yes, No. The company does not charge an additional fee for this service
-* `Contract`: Indicates the customer’s current contract type: Month-to-Month, One Year, Two Year
-* `Paperless Billing`: Indicates if the customer has chosen paperless billing: Yes, No
-* `Payment Method`: Indicates how the customer pays their bill: Bank Withdrawal, Credit Card, Mailed Check
-* `Tenure Buckets`: Indicates the range in which the customer's tenure value is, it is denoted in months: 0-20, 21-50, 50+
-* `Monthly Charges Buckets`: Indicates a range in which the customer’s current total monthly charge is for all their services from the company: 0-40, 41-60, 60+
-* `Multiple Lines Buckets`: Indicates if the customer subscribes to multiple telephone lines with the company: Yes; either has one line or not at all: Other
-* `Num Internet Services`: Indicates the total number of additional internet services the customer has: 0 - 6
-* `Churn`: Indicates if the customer have churned: Yes, No
+<img src="data_processing/images/churn_numinternetservices.png" width="400"/>
 
-### Implementation and refinement
+In the end, the following set of features was chosen to build the model:
+* `Gender`: The customer’s gender: *Male, Female*
+* `Senior Citizen`: Indicates if the customer is 65 or older: *Yes, No*
+* `Partner`: Indicates if the customer is a partner: *Yes, No*
+* `Dependents`: Indicates if the customer lives with any dependents (could be children, parents, grandparents): *Yes, No*
+* `Phone Service`: Indicates if the customer subscribes to home phone service with the company: *Yes, No*
+* `Internet Service`: Indicates if the customer subscribes to Internet service with the company: *No, DSL, Fiber Optic, Cable*
+* `Online Security`: Indicates if the customer subscribes to an additional online security service provided by the company: *Yes, No*
+* `Online Backup`: Indicates if the customer subscribes to an additional online backup service provided by the company: *Yes, No*
+* `Device Protection Plan`: Indicates if the customer subscribes to an additional device protection plan for their Internet equipment provided by the company: *Yes, No*
+* `Tech Support`: Indicates if the customer subscribes to an additional technical support plan from the company with reduced wait times: *Yes, No*
+* `Streaming TV`: Indicates if the customer uses their Internet service to stream television programing from a third party provider: *Yes, No*
+* `Streaming Movies`: Indicates if the customer uses their Internet service to stream movies from a third party provider: *Yes, No*
+* `Contract`: Indicates the customer’s current contract type:* Month-to-Month, One Year, Two Year*
+* `Paperless Billing`: Indicates if the customer has chosen paperless billing: *Yes, No*
+* `Payment Method`: Indicates how the customer pays their bill: *Bank Withdrawal, Credit Card, Mailed Check*
+* `Tenure Buckets`: Indicates the range in which the customer's tenure value is, it is denoted in months: *0-20, 21-50, 50+*
+* `Monthly Charges Buckets`: Indicates a range in which the customer’s current total monthly charge is for all their services from the company: *0-40, 41-60, 60+*
+* `Multiple Lines Buckets`: Indicates if the customer subscribes to multiple telephone lines with the company (*Yes*), or either has one line or not at all (*Other*)
+* `Num Internet Services`: Indicates the total number of additional internet services the customer has: *0 - 6*
+* `Churn`: Indicates if the customer have churned: *Yes, No*
+
+
+### Implementation
 
 The dataset is split into three parts:
 * train - to train the models,
@@ -92,6 +228,8 @@ To quickly iterate through various models I used the [PyCaret](https://pycaret.o
 With basic setup the results looked as follows:
 
 <img src="modelling/images/model_iter_01.png" alt="Models comparison - basic setup" width="600"/>
+
+### Refinement
 
 After testing some tweaks, I found that the best results gives the following configuration:
 * the feature `NumInternetServices` is chosen to be numerical, the rest is categorical,
@@ -162,6 +300,8 @@ Here are the statistics of the tuned models.
 
 All the models give similar results when it comes to F-score. I choose the logistic regression as the final model for the problem - it is a simple model which is easy to interpret and can be trained quickly.
 
+### Model evaluation and validation
+
 Here are the statistics describing the linear regression model which was trained using the entire train+test dataset and validated on unseen data:
 
 ```md
@@ -190,8 +330,101 @@ the customer:
 * uses the fiber optic (high churn),
 * the contract is month-to-month (high churn) or two-year (low churn).
 
-In order to obtain better results we would have to enrich this dataset with additional data
-about customers or come up with new features that would give us more relevant information.
+### Justification
+
+All five models give similar results. But they vary in terms of *recall* and *precision*. Although I already chose one, it was for the purpose of building the POC of the web app. The next step should be to discuss the statistics with the stakeholders. The chosen model should be the one that works best for the problem they have.
+
+### Reflection
+
+I trully believe that if we want our business to thrive, we need to know our customers and their needs. In this project I analyzed customer's data to predict their churn. Churn analysis plays an important role in learning what makes our customers lose interest in our product and how to better fulfill their needs.
+
+While doing this project I learned how using the Pycaret library makes it easy to iterate through ideas and leaves more time to spent on writing good quality code. When I do another analysis I will definitely try to explore using other, more advanced models.
+
+### Improvement
+
+In order to obtain better results we would have to enrich this dataset with additional data about customers or come up with new features that would give us more relevant information. For example, for the customers that have the two-year-contract, we may include a feature that indicates that their contract ends next month.
+
+## Project details
+
+### File structure
+
+```
+- app
+|- templates
+| |- base.html
+| |- dataset_details.html
+| |- home.html  # main page of web app
+| |- model_details.html
+| |- prediction.html
+|- images  # images of the web app for documentation
+|- app.py  # Flask file that runs app
+|- EDA-report.html  # EDA report generated with DataPrep
+
+- data
+|- WA_Fn-UseC_-Telco-Customer-Churn  # data to process
+|- transformed.csv  # transformed data in csv format
+|- customers.db  # transformed data saved to an SQL database
+
+- data_processing
+|- srs  # package with reusable functions for this section
+|- images  # images for documentation
+|- eda.ipynb  # notebook containing detailed EDA
+|- process_data.py  # pipeline
+
+- modelling
+|- srs  # package with reusable functions for this section
+|- images  # images with statistics for documentation
+|- lr_pipeline_31102021.pkl
+|- lr_pipeline_05112021.pkl
+|- model.ipynb  # notebook containing detailed evluation of ML models
+|- train_classifier.py  # pipeline
+
+- models
+|- linear_reg.pkl  # Model used for the web app
+
+- README.md
+- requirements.txt
+- environment.yaml
+```
+
+### How to run it
+
+To run this project the [conda](https://docs.conda.io/en/latest/) package and environment manager is being used.
+Creating the conda environment
+
+Libraries and their versions required for replication of this analysis are listed in the `requirements.txt` file.
+
+Python version: 3.8.12
+
+Run `conda create --name <env> --file requirements.txt` to create a conda environment, and then `conda activate <env>` to activate it.
+
+#### Notebooks
+
+Navigate to the projekt's main directory and run `jupyter lab`, then you can open the notebooks from within this lab environment.
+
+#### Pipelines
+
+Go to the projekt's main directory.
+
+Use the following command to run the data processing pipeline:
+```bash
+python data_processing/process_data.py data/WA_Fn-UseC_-Telco-Customer-Churn.csv data/customers.db
+```
+as a result, you will obtain a transformed dataset which is saved in an SQL database `customers.db`.
+
+Use the following command to run the machine learning pipeline:
+```bash
+python modelling/train_classifier.py data/customers.db models/linear_reg.pkl
+```
+as a result, you will obtain a machine learning pipeline which is saved as a `linear_reg.pkl` file.
+
+#### Web App
+
+Use the following command to run the web app:
+```bash
+python app/app.py data/customers.db models/linear_reg.pkl
+```
+and then open this address in your web browser: `http://192.168.1.37:3001/`.
 
 ## Web app
 
