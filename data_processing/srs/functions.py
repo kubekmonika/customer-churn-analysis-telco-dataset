@@ -38,10 +38,10 @@ def plot_distribution(data, columns_type):
     elif columns_type=='objects':
 
         df = data.select_dtypes(include=['object']).melt()
-        df['ones'] = 1
+        df['Count'] = 1
 
         g = sns.FacetGrid(df, col='variable', height=4, aspect=1, col_wrap=3, sharex=False, sharey=False)
-        g.map_dataframe(sns.barplot, x='value', y='ones', estimator=np.sum)
+        g.map_dataframe(sns.barplot, x='value', y='Count', estimator=np.sum)
 
         # Rotate long labels so they do not overlap
         for val, ax in g.axes_dict.items():
