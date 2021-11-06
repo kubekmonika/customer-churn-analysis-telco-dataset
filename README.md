@@ -37,6 +37,7 @@ In our problem we want to detected as many customers who may churn as possible, 
 Below you will find customer characteristcs reported in the dataset with visualisation of their distribution, some statistics, and association with churn.
 
 ##### Numerical
+
 * `Tenure` How long they’ve been a customer (in months)
 * `Monthly Charge` Indicates the customer’s current total monthly charge for all their services from the company
 * `Total Charges` Indicates the customer’s total charges
@@ -44,45 +45,60 @@ Below you will find customer characteristcs reported in the dataset with visuali
 <img src="data_processing/images/stats_numerical.png" width="300"/>
 
 ##### Categorical
+
 * `Gender` The customer’s gender: *Male, Female*
+
 | Gender   |   Share of churned customers |
 |:---------|-----------------------------:|
 | Female   |                     0.269209 |
 | Male     |                     0.261603 |
+
 * `Senior Citizen` Indicates if the customer is 65 or older: *Yes, No*
+
 | SeniorCitizen   |   Share of churned customers |
 |:----------------|-----------------------------:|
 | No              |                     0.236062 |
 | Yes             |                     0.416813 |
+
 * `Partner` Indicates if the customer is a partner: *Yes, No*
+
 | Partner   |   Share of churned customers |
 |:----------|-----------------------------:|
 | No        |                     0.32958  |
 | Yes       |                     0.196649 |
+
 * `Dependents` Indicates if the customer lives with any dependents (could be children, parents, grandparents): *Yes, No*
+
 | Dependents   |   Share of churned customers |
 |:-------------|-----------------------------:|
 | No           |                     0.312791 |
 | Yes          |                     0.154502 |
 
 * `Phone Service` Indicates if the customer subscribes to home phone service with the company: *Yes, No*
+
 | PhoneService   |   Share of churned customers |
 |:---------------|-----------------------------:|
 | No             |                     0.249267 |
 | Yes            |                     0.267096 |
+
 * `Multiple Lines` Indicates if the customer subscribes to multiple telephone lines with the company: *Yes, No*
+
 | MultipleLines    |   Share of churned customers |
 |:-----------------|-----------------------------:|
 | No               |                     0.250442 |
 | No phone service |                     0.249267 |
 | Yes              |                     0.286099 |
+
 * `Internet Service` Indicates if the customer subscribes to Internet service with the company: *No, DSL, Fiber Optic, Cable*
+
 | InternetService   |   Share of churned customers |
 |:------------------|-----------------------------:|
 | DSL               |                    0.189591  |
 | Fiber optic       |                    0.418928  |
 | No                |                    0.0740498 |
+
 * `Online Security` Indicates if the customer subscribes to an additional online security service provided by the company: *Yes, No*
+
 | 'InternetService', 'OnlineSecurity' |   Share of churned customers |
 |:------------------------------|-----------------------------:|
 | ('DSL', 'No')                 |                    0.279613  |
@@ -90,7 +106,9 @@ Below you will find customer characteristcs reported in the dataset with visuali
 | ('Fiber optic', 'No')         |                    0.493576  |
 | ('Fiber optic', 'Yes')        |                    0.218117  |
 | ('No', 'No internet service') |                    0.0740498 |
+
 * `Online Backup` Indicates if the customer subscribes to an additional online backup service provided by the company: *Yes, No*
+
 | 'InternetService', 'OnlineBackup'|   Share of churned customers |
 |:------------------------------|-----------------------------:|
 | ('DSL', 'No')                 |                    0.256929  |
@@ -98,7 +116,9 @@ Below you will find customer characteristcs reported in the dataset with visuali
 | ('Fiber optic', 'No')         |                    0.507701  |
 | ('Fiber optic', 'Yes')        |                    0.303053  |
 | ('No', 'No internet service') |                    0.0740498 |
+
 * `Device Protection Plan` Indicates if the customer subscribes to an additional device protection plan for their Internet equipment provided by the company: *Yes, No*
+
 | 'InternetService', 'DeviceProtection'|   Share of churned customers |
 |:------------------------------|-----------------------------:|
 | ('DSL', 'No')                 |                    0.256929  |
@@ -106,7 +126,9 @@ Below you will find customer characteristcs reported in the dataset with visuali
 | ('Fiber optic', 'No')         |                    0.507701  |
 | ('Fiber optic', 'Yes')        |                    0.303053  |
 | ('No', 'No internet service') |                    0.0740498 |
+
 * `Tech Support` Indicates if the customer subscribes to an additional technical support plan from the company with reduced wait times: *Yes, No*
+
 | 'InternetService', 'TechSupport' |   Share of churned customers |
 |:------------------------------|-----------------------------:|
 | ('DSL', 'No')                 |                    0.277554  |
@@ -114,7 +136,9 @@ Below you will find customer characteristcs reported in the dataset with visuali
 | ('Fiber optic', 'No')         |                    0.493722  |
 | ('Fiber optic', 'Yes')        |                    0.226328  |
 | ('No', 'No internet service') |                    0.0740498 |
+
 * `Streaming TV` Indicates if the customer uses their Internet service to stream television programing from a third party provider: *Yes, No*
+
 | 'InternetService', 'StreamingTV' |   Share of churned customers |
 |:------------------------------|-----------------------------:|
 | ('DSL', 'No')                 |                    0.226776  |
@@ -122,7 +146,9 @@ Below you will find customer characteristcs reported in the dataset with visuali
 | ('Fiber optic', 'No')         |                    0.453195  |
 | ('Fiber optic', 'Yes')        |                    0.392571  |
 | ('No', 'No internet service') |                    0.0740498 |
+
 * `Streaming Movies` Indicates if the customer uses their Internet service to stream movies from a third party provider: *Yes, No*
+
 | 'InternetService', 'StreamingMovies'|   Share of churned customers |
 |:------------------------------|-----------------------------:|
 | ('DSL', 'No')                 |                    0.223611  |
@@ -130,24 +156,31 @@ Below you will find customer characteristcs reported in the dataset with visuali
 | ('Fiber optic', 'No')         |                    0.457993  |
 | ('Fiber optic', 'Yes')        |                    0.388921  |
 | ('No', 'No internet service') |                    0.0740498 |
+
 * `Contract` Indicates the customer’s current contract type: *Month-to-Month, One Year, Two Year*
+
 | Contract       |   Share of churned customers |
 |:---------------|-----------------------------:|
 | Month-to-month |                    0.427097  |
 | One year       |                    0.112695  |
 | Two year       |                    0.0283186 |
+
 * `Paperless Billing` Indicates if the customer has chosen paperless billing: *Yes, No*
+
 | PaperlessBilling   |   Share of churned customers |
 |:-------------------|-----------------------------:|
 | No                 |                     0.163301 |
 | Yes                |                     0.335651 |
+
 * `Payment Method` Indicates how the customer pays their bill: *Bank Withdrawal, Credit Card, Mailed Check*
+
 | PaymentMethod             |   Share of churned customers |
 |:--------------------------|-----------------------------:|
 | Bank transfer (automatic) |                     0.167098 |
 | Credit card (automatic)   |                     0.152431 |
 | Electronic check          |                     0.452854 |
 | Mailed check              |                     0.191067 |
+
 * `Churn` Indicates if the customer have churned: *Yes, No*
 
 ### Data Visualisation
