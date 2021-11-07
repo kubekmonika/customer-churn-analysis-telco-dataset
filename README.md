@@ -258,13 +258,38 @@ In training all the models, the 5-fold cross-validation is used. We do not need 
 
 To quickly iterate through various models I used the [PyCaret](https://pycaret.org/) library. It is an open-source, low-code machine learning library in Python that automates machine learning workflows.
 
-With basic setup the results looked as follows:
+With default parameters of the models and the basic setup in PyCaret
+```python
+setup(
+    data, 
+    target='Churn',
+    n_jobs=5,
+    fold=5,
+    train_size=0.8,
+    silent=True,
+);
+```
+
+the results looked as follows:
 
 <img src="modelling/images/model_iter_01.png" alt="Models comparison - basic setup" width="600"/>
 
 ### Refinement
 
 After testing some tweaks, I found that the best results gives the following configuration:
+```python
+setup(
+    data, 
+    target='Churn',
+    n_jobs=5,
+    fold=5,
+    train_size=0.8,
+    silent=True,
+    numeric_features=['NumInternetlServices'],
+    normalize=True,
+    fix_imbalance=True,
+);
+```
 * the feature `NumInternetServices` is chosen to be numerical, the rest is categorical,
 * the numeric feature is normalised, the `z-score` normalisation is used,
 * SMOTE method is used to fix the imbalance.
@@ -273,14 +298,33 @@ And here are the results:
 
 <img src="modelling/images/model_iter_02.png" alt="Models comparison - final setup" width="600"/>
 
-We see that the later setup improved the F1 score for the top three models.
+We see that the later setup improved the F-score for the top three models.
 
-After settling on the features, I moved to the next step which is tuning the hyper-parameters.
-Firstly, I searched for best parameters. Secondly, I tested the models on test data.
+After settling on the features, I moved to the next step which is tuning the hyper-parameters. Firstly, I searched for best parameters. Secondly, I tested the models on test data.
 
-Here are the statistics of the tuned models.
+For each model, I present the grid of parameters I used, the configuration with best results, and a summary statistics of the tuned models.
 
 **Logistic regression**
+
+```python
+# Grid
+custom_grid = {
+    'fit_intercept': [True],
+    'solver': ['saga'],
+    'penalty': ['elasticnet'],
+    'C': np.logspace(0.0001, 4, num=50) / 100,
+    'class_weight': ['balanced'],
+    'dual': [False],
+    'max_iter': [1000],
+    'l1_ratio': [0, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 1]
+}
+# Final configuration
+LogisticRegression(C=0.11515901968065019, class_weight='balanced', dual=False,
+                   fit_intercept=True, intercept_scaling=1, l1_ratio=0.9,
+                   max_iter=1000, multi_class='auto', n_jobs=None,
+                   penalty='elasticnet', random_state=4386, solver='saga',
+                   tol=0.0001, verbose=0, warm_start=False)
+```
 
 ```md
 +---------------+------------+----------+-------------+-------+
@@ -291,6 +335,22 @@ Here are the statistics of the tuned models.
 ```
 
 **Ridge classifier**
+
+```python
+# Grid
+custom_grid = {
+    'fit_intercept': [True],
+    'max_iter': [1000],
+    'normalize': [True, False],
+    'class_weight': ['balanced'],
+    'solver': ['auto'],
+    'alpha': np.logspace(0.0001, 4, num=50) / 1000,
+}
+# Final configuration
+RidgeClassifier(alpha=0.07544041722863098, class_weight='balanced', copy_X=True,
+                fit_intercept=True, max_iter=1000, normalize=True,
+                random_state=4386, solver='auto', tol=0.001)
+```
 
 ```md
 +---------------+------------+----------+-------------+-------+
@@ -303,6 +363,28 @@ Here are the statistics of the tuned models.
 
 **Linear SVM**
 
+```python
+# Grid
+custom_grid = {
+    'loss': ['hinge'], # This value is required for the model to be SVM
+    'penalty': ['elasticnet'],
+    'alpha': np.logspace(0.0001, 4, num=50) / 100000,
+    'l1_ratio': [0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99],
+    'fit_intercept': [True],
+    'max_iter': [500],
+    'learning_rate': ['optimal'],
+    'class_weight': ['balanced'],
+}
+# Final configuration
+SGDClassifier(alpha=7.907455101892067e-05, average=False,
+              class_weight='balanced', early_stopping=False, epsilon=0.1,
+              eta0=0.001, fit_intercept=True, l1_ratio=0.95,
+              learning_rate='optimal', loss='hinge', max_iter=500,
+              n_iter_no_change=5, n_jobs=5, penalty='elasticnet', power_t=0.5,
+              random_state=4386, shuffle=True, tol=0.001,
+              validation_fraction=0.1, verbose=0, warm_start=False)
+```
+
 ```md
 +---------------+------------+----------+-------------+-------+
 |               |   Accuracy |   Recall |   Precision |    F1 |
@@ -313,6 +395,20 @@ Here are the statistics of the tuned models.
 
 **KNN classifier**
 
+```python
+# Grid
+custom_grid = {
+    'n_neighbors': np.arange(1, 21, 1),
+    'weights': ['uniform', 'distance'],
+    'leaf_size': [20, 30, 40],
+    'p': [0, 1, 2]
+}
+# Final configuration
+KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+                     metric_params=None, n_jobs=5, n_neighbors=20, p=1,
+                     weights='uniform')
+```
+
 ```md
 +---------------+------------+----------+-------------+-------+
 |               |   Accuracy |   Recall |   Precision |    F1 |
@@ -322,6 +418,26 @@ Here are the statistics of the tuned models.
 ```
 
 **Decision tree**
+
+```python
+# Grid
+custom_grid = {
+    'criterion': ['gini', 'entropy'],
+    'splitter': ['best'],
+    'max_depth': np.arange(2, 11, 1),
+    'max_features': ['log2'],
+    'class_weight': ['balanced'],
+    'ccp_alpha': np.logspace(0.0001, 4, num=50)[:25] / 10000
+}
+# Final configuration
+DecisionTreeClassifier(ccp_alpha=0.002442420340775528, class_weight='balanced',
+                       criterion='gini', max_depth=9, max_features='log2',
+                       max_leaf_nodes=None, min_impurity_decrease=0.0,
+                       min_impurity_split=None, min_samples_leaf=1,
+                       min_samples_split=2, min_weight_fraction_leaf=0.0,
+                       presort='deprecated', random_state=4386,
+                       splitter='best')
+```
 
 ```md
 +---------------+------------+----------+-------------+-------+
