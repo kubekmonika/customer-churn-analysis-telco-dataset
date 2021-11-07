@@ -451,7 +451,7 @@ All the models give similar results when it comes to F-score. I choose the logis
 
 ### Model evaluation and validation
 
-Here are the statistics describing the linear regression model which was trained using the entire train+test dataset and validated on unseen data:
+Here are the statistics describing the tuned linear regression model which was trained using the entire train+test dataset and validated on unseen data:
 
 ```md
 +---------------+------------+----------+-------------+------+
@@ -485,13 +485,21 @@ All five models give similar results. But they vary in terms of *recall* and *pr
 
 ### Reflection
 
-I trully believe that if we want our business to thrive, we need to know our customers and their needs. In this project I analyzed customer's data to predict their churn. Churn analysis plays an important role in learning what makes our customers lose interest in our product and how to better fulfill their needs.
+In this project I analyzed customer's data to predict their churn. 
 
-While doing this project I learned how using the Pycaret library makes it easy to iterate through ideas and leaves more time to spent on writing good quality code. When I do another analysis I will definitely try to explore using other, more advanced models.
+Firstly, I did data wrangling. I made an exploratory analysis of the dataset and studied how each customer characteristic correlates with churn. I transformed two numerical features `Tenure` an `Monthly Charges` into categorical ones. I also enriched the dataset with a new feature - `Num Internet Services` - which indicates a number of Internet services a customer uses.
+
+Secondly, I created a model to predict churn. I chose the evaluation metric to be F-score. I also chose a set of models: logistic regression, ridge classifier, SVM with linear kernel, K-nearest neighbors classifier, decision tree classifier. I made an initial benchmark of their effectiveness by training the models with their default setup and checking the F-score values. Then, I tuned their hyper-parameters, compared the results, and picked the final model - logistic regression.
+
+Finally, I summarized the model evaluation, shown the prediction error and confusion matrix. I also emphasized the features that are the most relevant for the prediction.
+
+While doing this project I learned how using the Pycaret library makes it easy to iterate through ideas and leaves more time to spent on writing good quality code. When I do another analysis I will definitely explore more advanced models, as well as other features of this library.
 
 ### Improvement
 
 In order to obtain better results we would have to enrich this dataset with additional data about customers or come up with new features that would give us more relevant information. For example, for the customers that have the two-year-contract, we may include a feature that indicates that their contract ends next month.
+
+When it comes to improving the model, there are also few things we can do. The first one is calibrating the classification model so that the estimates of the class probabilities give more reliable values. The second one is trying various ensembling methods. The third one is trying more advanced models, such as LightGBM or XGBoost.
 
 ## Project details
 
